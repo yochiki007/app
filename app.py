@@ -36,9 +36,9 @@ if prompt := st.chat_input("มีอะไรอยากเล่าให้�
     with st.chat_message("user"):
         st.markdown(prompt)
 
-    with st.chat_message("assistant"):
+with st.chat_message("assistant"):
         try:
-            chat_completion = client.chat.completi  ons.create(
+            chat_completion = client.chat.completions.create(
                 messages=st.session_state.messages,
                 model=st.session_state.model,
             )
