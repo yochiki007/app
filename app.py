@@ -1,9 +1,7 @@
-
 import streamlit as st
 from groq import Groq
 
-# แทนที่จะพิมพ์ Key ลงไปตรงๆ ให้ใช้ st.secrets แทน
-# ระบบจะไปดึงค่าจากหน้าตั้งค่าของ Streamlit มาให้เองครับ
+# 1. ดึง API Key จาก Streamlit Secrets
 try:
     API_KEY = st.secrets["GROQ_API_KEY"]
 except:
@@ -12,13 +10,14 @@ except:
 
 client = Groq(api_key=API_KEY)
 
-# --- ส่วนที่เหลือของโค้ดคงเดิมตามที่ผมให้ไปครั้งก่อน ---
 st.set_page_config(page_title="Relationship Coach", page_icon="❤️")
 st.title("❤️ AI ที่ปรึกษาด้านความสัมพันธ์")
-# ... (โค้ดส่วนเดิมทั้งหมด)if "model" not in st.session_state:
-st.session_state.model = "llama3-70b-8192"
 
-# ตัวจัดการประวัติการสนทนา
+# 2. อัปเดตชื่อโมเดลเป็นรุ่นล่าสุด (llama-3.3-70b-versatile)
+if "model" not in st.session_state:
+    st.session_state.model = "llama-3.3-70b-versatile"
+
+# 3. ตัวจัดการประวัติการสนทนา
 if "messages" not in st.session_state:
     st.session_state.messages = [
         {"role": "system", "content": "คุณเป็นที่ปรึกษาด้านความสัมพันธ์ที่เชี่ยวชาญ ให้คำปรึกษาอย่างอบอุ่นและไม่ตัดสิน"}
@@ -30,13 +29,14 @@ for message in st.session_state.messages:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
 
-# รับข้อความจากผู้ใช้
+# 4. รับข้อความจากผู้ใช้
 if prompt := st.chat_input("มีอะไรอยากเล่าให้ฟังไหมคะ?"):
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.markdown(prompt)
 
-with st.chat_message("assistant"):
+    # 5. ส่วนตอบกลับของ AI (ต้องอยู่ภายใต้เงื่อนไข if prompt เพื่อให้ทำงานเมื่อมีการส่งข้อความ)
+    with st.chat_message("assistant"):
         try:
             chat_completion = client.chat.completions.create(
                 messages=st.session_state.messages,
